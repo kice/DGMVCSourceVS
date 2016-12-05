@@ -1,0 +1,74 @@
+---------------------------------------------
+DGMVCSource 1.0.0 build 25, by Donald A. Graft
+---------------------------------------------
+
+Requirements
+------------
+
+* Windows 7 or 8
+* x86 or x64
+
+Preparation
+-----------
+
+Make sure the included libmfxsw32.dll(or libmfxsw64.dll) is in the same directory as DGMVCSourceVS.dll.
+
+Syntax
+------
+
+E.g.:
+
+DGMVCSource("combined.264","",view=0,frames=2000,mode="auto")
+or 
+DGMVCSource("base.264","dependent.264",view=0,frames=2000,mode="auto")
+
+* single source clip is the combined MVC elementary stream, made with eac3to and mvccombine,
+  or dual source clips are the base and dependent elementary streams.
+* if a single source clip is specified that is a normal AVC file (not a combined MVC file),
+  then it will be correctly treated as a normal AVC file, and the view parameter is ignored.
+* view: 0 = interleaved left and right, 1 = left only, 2 = right only.
+* frames: number of frames, if too few the stream is truncated, if too many extra black frames are returned
+  The specified frames parameter is internally doubled when delivering interleaved, i.e., when view=0.
+* mode chooses mode of decoding: "auto" (default) - use HW acceleration if it is available, otherwise use SW,
+  "sw" - force SW decoding, "hw" - force HW acceleration, fail if it is not available. If mode is
+  not specified, then "auto" is assumed.
+* multiple instantiation in a single script is supported to the limit of available resources.
+
+Script Examples
+---------------
+
+Return interleaved left and right views:
+
+	dgmvcsource("combined.264","",view=0,frames=2000)
+	or
+	dgmvcsource("base.264","dependent.264",view=0,frames=2000)
+
+Return only the left view:
+
+	dgmvcsource("combined.264","",view=1,frames=2000)
+	or
+	dgmvcsource("base.264","dependent.264",view=1,frames=2000)
+
+Return only the right view:
+
+	dgmvcsource("combined.264","",view=2,frames=2000)
+	or
+	dgmvcsource("base.264","dependent.264",view=2,frames=2000)
+
+Return Half SBS conversion:
+
+	vid=dgmvcsource("base.264","dependent.264",view=0,frames=2000)
+	left=vid.selecteven()
+	right=vid.selectodd()
+	stackhorizontal(horizontalreduceby2(left),horizontalreduceby2(right))
+	# or, to swap the views:
+	# stackhorizontal(horizontalreduceby2(right),horizontalreduceby2(left))
+
+
+Limitations to Be Addressed
+---------------------------
+
+* No seeking, linear access only except for selecteven/selectodd both present as shown above
+  for the Half SBS example
+
+Copyright (C) 2014-2016 Donald A. Graft, All Rights Reserved
